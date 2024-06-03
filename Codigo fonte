@@ -1,0 +1,180 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(12,11,5,4,3,2);
+
+int trigpin = 13, echopin = 12;
+long time;
+float dist;
+
+int ledpin1 = 11, ledpin2 = 10, ledpin3 = 9, ledpin4 = 8, ledpin5 = 7;
+
+int tempPin = 14;
+int turbidityPin = A1;
+int TDSpin = 2;
+int PHpin = 3;
+int disPin = 6;
+
+void setup()
+{
+  Serial.begin(9600);
+  lcd.begin(16,2);
+  
+  pinMode(trigpin, OUTPUT);
+  pinMode(echopin, INPUT);
+  
+  pinMode(ledpin1, OUTPUT);
+  pinMode(ledpin2, OUTPUT);
+  pinMode(ledpin3, OUTPUT);
+  pinMode(ledpin4, OUTPUT);
+  pinMode(ledpin5, OUTPUT);
+  
+  pinMode(tempPin, INPUT);
+  pinMode(turbidityPin, INPUT);
+  pinMode(TDSpin, INPUT);
+  pinMode(PHpin, INPUT);
+  pinMode(disPin, INPUT);
+}
+
+void loop()
+{
+  //temperatura da agua
+  int temp = analogRead(tempPin);
+  float voltage = temp * 5;
+  voltage = voltage / 24;
+  float temperatureC = voltage - 0.5;
+  temperatureC = temperatureC + 100;
+  delay(1200);
+  
+  //turvosidade da agua
+  int turbidity = analogRead(turbidityPin);
+  int turl = map(turbidity, 0, 471, 0, 5);
+  delay(1200);
+  
+  //TDS sensor 
+  int TDS = analogRead(TDSpin);
+  int TDS1 = map(TDS, 0, 1023, 0, 2000);
+  delay(1200);
+  
+  //PH sensor 
+  int PH = analogRead(PHpin);
+  int PH1 = map(PH, 0, 1023, 0, 14);
+  delay(1200);
+  
+  Serial.print("Temperatura:"); 
+  Serial.println(temperatureC);
+  Serial.print("Turva:"); 
+  Serial.println(turl);
+  Serial.print("TDS:");
+  Serial.println(TDS1);
+  Serial.print("PH:");
+  Serial.println(PH1);
+  
+  //LCD para sobrevivencia dos peixes
+  int dis = digitalRead(disPin);
+  if (dis == LOW)
+  {
+    if (turl >= 4 && TDS1 < 600 && (PH1 >= 6.5 && PH1 < 7))
+    {
+      lcd.setCursor(1,0);
+      lcd.print("Bom");
+      Serial.println("Bom");
+    }
+    else
+    {
+      lcd.setCursor(1,0);
+      lcd.print("Perigo");
+      Serial.println("Perigo");
+      delay(1400);
+    }
+  }
+  else
+  {
+    //LCD temperature
+    lcd.setCursor(1,0); lcd.print("Temperatura");
+    lcd.setCursor(7,0); lcd.print(temperatureC);
+    delay(1400);
+    lcd.clear();
+    
+    //LCD para turvosidade da agua
+    lcd.setCursor(1,0); lcd.print("TURB");
+    lcd.setCursor(7,0); lcd.print(turl);
+    delay(1200);
+    lcd.clear();
+    
+    //LCD para o ph
+    lcd.setCursor(1,0); lcd.print("PH");
+    lcd.setCursor(7,0); lcd.print(PH1);
+    delay(1200);
+    lcd.clear();
+    
+    //LCD para o TDS
+    lcd.setCursor(1,0); lcd.print("TDS");
+    lcd.setCursor(7,0); lcd.print(TDS1);
+    delay(1200);
+    lcd.clear();
+  }
+    digitalWrite(trigpin, LOW);
+  delay(1200);
+  digitalWrite(trigpin, HIGH);
+  delay(1200);
+  digitalWrite(trigpin, LOW);
+  
+  time = pulseIn(echopin, HIGH);
+  dist = (0.3444*time)/20;
+  
+  lcd.setCursor(0,0);
+  lcd.print("Distancia =");
+  lcd.print(dist);
+  lcd.setCursor(0,1);
+  lcd.print("cm");
+  
+  if (dist > 0 && dist <= 67)
+  {
+    digitalWrite(ledpin1, HIGH);
+    digitalWrite(ledpin2, LOW);
+    digitalWrite(ledpin3, LOW);
+    digitalWrite(ledpin4, LOW);
+digitalWrite(ledpin5, LOW);
+  }
+  if (dist > 67 && dist <= 134)
+  {
+    digitalWrite(ledpin1, HIGH);
+    digitalWrite(ledpin2, HIGH);
+    digitalWrite(ledpin3, LOW);
+    digitalWrite(ledpin4, LOW);
+    digitalWrite(ledpin5, LOW);
+  }
+  if (dist > 134 && dist <= 201)
+  {
+    digitalWrite(ledpin1, HIGH);
+    digitalWrite(ledpin2, HIGH);
+    digitalWrite(ledpin3, HIGH);
+    digitalWrite(ledpin4, LOW);
+    digitalWrite(ledpin5, LOW);
+  }
+  if (dist > 201 && dist <= 268)
+  {
+    digitalWrite(ledpin1, HIGH);
+    digitalWrite(ledpin2, HIGH);
+    digitalWrite(ledpin3, HIGH);
+    digitalWrite(ledpin4, HIGH);
+    digitalWrite(ledpin5, LOW);
+  }
+  if (dist > 268 && dist <= 333)
+  {
+    digitalWrite(ledpin1, HIGH);
+    digitalWrite(ledpin2, HIGH);
+    digitalWrite(ledpin3, HIGH);
+    digitalWrite(ledpin4, HIGH);
+    digitalWrite(ledpin5, HIGH);
+  }
+  else
+  {
+    digitalWrite(ledpin1, LOW);
+    digitalWrite(ledpin2, LOW);
+    digitalWrite(ledpin3, LOW);
+    digitalWrite(ledpin4, LOW);
+    digitalWrite(ledpin5, LOW);
+  }
+}
+
+  
