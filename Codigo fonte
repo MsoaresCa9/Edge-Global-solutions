@@ -37,31 +37,32 @@ void setup()
 void loop()
 {
   //temperatura da agua
-  int temp = analogRead(tempPin);
-  float voltage = temp * 5;
-  voltage = voltage / 24;
-  float temperatureC = voltage - 0.5;
-  temperatureC = temperatureC + 100;
-  delay(1200);
-  
-  //turvosidade da agua
+ 	int temp = analogRead(tempPin);
+  Serial.println(temp);
+  float temperatureC = 0;
+  //float voltage = temp * 10;
+  //voltage = voltage / 30;
+  temperatureC = map(temp, 20, 358, -40, 125);
+  //float temperatureC = voltage - 0.5;
+  //delay(1200);
+  //solidos presentes na agua
   int turbidity = analogRead(turbidityPin);
   int turl = map(turbidity, 0, 471, 0, 5);
-  delay(1200);
+  //delay(1200);
   
   //TDS sensor 
   int TDS = analogRead(TDSpin);
   int TDS1 = map(TDS, 0, 1023, 0, 2000);
-  delay(1200);
+  //delay(1200);
   
   //PH sensor 
   int PH = analogRead(PHpin);
   int PH1 = map(PH, 0, 1023, 0, 14);
-  delay(1200);
+  //delay(1200);
   
   Serial.print("Temperatura:"); 
   Serial.println(temperatureC);
-  Serial.print("Turva:"); 
+  Serial.print("turl:"); 
   Serial.println(turl);
   Serial.print("TDS:");
   Serial.println(TDS1);
@@ -72,11 +73,12 @@ void loop()
   int dis = digitalRead(disPin);
   if (dis == LOW)
   {
-    if (turl >= 4 && TDS1 < 600 && (PH1 >= 6.5 && PH1 < 7))
+    //if (turl >= 2 && TDS1 > 1300 && (PH<=6.5 && PH1>=8)&& (temp>=27 && temp<=38))
+    if ((PH1>=6 && PH1<=8)&& (temperatureC>=27 && temperatureC<=38))
     {
       lcd.setCursor(1,0);
-      lcd.print("Bom");
-      Serial.println("Bom");
+      lcd.print("Otimo!");
+      Serial.println("Otimo!");
     }
     else
     {
@@ -94,7 +96,7 @@ void loop()
     delay(1400);
     lcd.clear();
     
-    //LCD para turvosidade da agua
+    //LCD para luminosidade
     lcd.setCursor(1,0); lcd.print("TURB");
     lcd.setCursor(7,0); lcd.print(turl);
     delay(1200);
@@ -111,70 +113,5 @@ void loop()
     lcd.setCursor(7,0); lcd.print(TDS1);
     delay(1200);
     lcd.clear();
-  }
-    digitalWrite(trigpin, LOW);
-  delay(1200);
-  digitalWrite(trigpin, HIGH);
-  delay(1200);
-  digitalWrite(trigpin, LOW);
-  
-  time = pulseIn(echopin, HIGH);
-  dist = (0.3444*time)/20;
-  
-  lcd.setCursor(0,0);
-  lcd.print("Distancia =");
-  lcd.print(dist);
-  lcd.setCursor(0,1);
-  lcd.print("cm");
-  
-  if (dist > 0 && dist <= 67)
-  {
-    digitalWrite(ledpin1, HIGH);
-    digitalWrite(ledpin2, LOW);
-    digitalWrite(ledpin3, LOW);
-    digitalWrite(ledpin4, LOW);
-digitalWrite(ledpin5, LOW);
-  }
-  if (dist > 67 && dist <= 134)
-  {
-    digitalWrite(ledpin1, HIGH);
-    digitalWrite(ledpin2, HIGH);
-    digitalWrite(ledpin3, LOW);
-    digitalWrite(ledpin4, LOW);
-    digitalWrite(ledpin5, LOW);
-  }
-  if (dist > 134 && dist <= 201)
-  {
-    digitalWrite(ledpin1, HIGH);
-    digitalWrite(ledpin2, HIGH);
-    digitalWrite(ledpin3, HIGH);
-    digitalWrite(ledpin4, LOW);
-    digitalWrite(ledpin5, LOW);
-  }
-  if (dist > 201 && dist <= 268)
-  {
-    digitalWrite(ledpin1, HIGH);
-    digitalWrite(ledpin2, HIGH);
-    digitalWrite(ledpin3, HIGH);
-    digitalWrite(ledpin4, HIGH);
-    digitalWrite(ledpin5, LOW);
-  }
-  if (dist > 268 && dist <= 333)
-  {
-    digitalWrite(ledpin1, HIGH);
-    digitalWrite(ledpin2, HIGH);
-    digitalWrite(ledpin3, HIGH);
-    digitalWrite(ledpin4, HIGH);
-    digitalWrite(ledpin5, HIGH);
-  }
-  else
-  {
-    digitalWrite(ledpin1, LOW);
-    digitalWrite(ledpin2, LOW);
-    digitalWrite(ledpin3, LOW);
-    digitalWrite(ledpin4, LOW);
-    digitalWrite(ledpin5, LOW);
-  }
+  }	
 }
-
-  
